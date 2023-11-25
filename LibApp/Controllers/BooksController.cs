@@ -1,23 +1,37 @@
-﻿using LibApp.Models;
+﻿using LibApp.Data;
+using LibApp.Models;
 using LibApp.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
 
 namespace LibApp.Controllers
 {
     public class BooksController : Controller
     {
+        public BooksController(ApplicationDbContext context) 
+        {
+            _context = context;
+        }
+
+
         // GET: BooksController
         public ActionResult Index()
         {
-            return View();
+            var books = _context.Books.Include(b => b.Genre).ToList();
+
+            return View(books);
         }
 
         // GET: BooksController/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            var book = _context.Books
+                .Include(b => b.Genre)
+                .SingleOrDefault(b => b.Id == id);
+
+            return View(book);
         }
 
         // GET: BooksController/Create
@@ -107,5 +121,7 @@ namespace LibApp.Controllers
                 return View();
             }
         }
+
+        private ApplicationDbContext _context;
     }
 }
